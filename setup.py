@@ -28,7 +28,8 @@ setup(
             "publisher = tmplt_py.publisher_node:main",
             "subscriber = tmplt_py.subscriber_node:main",
             "server = tmplt_py.server_node:main",
-            "client = tmplt_py.client_node:main"
+            "client = tmplt_py.client_node:main",
+            "parameter = tmplt_py.parameter_node:main"
         ],
     },
 )
