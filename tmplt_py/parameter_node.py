@@ -1,5 +1,6 @@
 import rclpy
 from rclpy.node import Node
+from rclpy.parameter import Parameter
 
 # message type used in this example.
 # Custom message types can also be used
@@ -9,6 +10,8 @@ from rclpy.node import Node
 # > ros2 interface show example_interfaces/msg/String
 from example_interfaces.msg import String 
 
+PARAM_NAME="name"
+
 class ParameterNode(Node):
     def __init__(self):
         super().__init__("parameter")
@@ -17,13 +20,16 @@ class ParameterNode(Node):
         self.create_timer(1, self.print_name_callback)
 
         # declare a ROS parameter : -> use data type of the default value to associate a type to the parameter
-        self.declare_parameter("name", "R2D2")
-
+        self.declare_parameter(PARAM_NAME, "R2D2")
 
         # get parameter value
-        self._name = self.get_parameter("name").value
+        self._name = self.get_parameter(PARAM_NAME).value
 
-        # publish on the "/counter" topic
+        # make the parameter modifyable at runtime (by other nodes, ...)
+        self.add_on_set_parameters_callback(self.parameters_callback)
+
+
+        # publish on the "/print_name" topic
         self._publisher = self.create_publisher(String, "print_name", 10)
     
     def print_name_callback(self) -> None:
@@ -33,6 +39,13 @@ class ParameterNode(Node):
         msg = String()
         msg.data = f"Hello this is {self._name}"
         self._publisher.publish(msg)
+
+    def parameters_callback(self, params:list[Parameter]) -> None:
+        # NOTE : the callback is not called for an unknown reason... Current ROS2 bug? 
+        for param in params:
+            if param.name == PARAM_NAME:
+                self._name = param.value
+                
 
     
 def main(args=None):
@@ -46,4 +59,6 @@ if __name__ == "__main__":
     main()
 
     # Note : to test this code works:
-    # > ros2 topic echo /counter
+    # > ros2 topic echo /print_name
+    # > ros2 parameter set /name "C3PO"
+    # > ros2 parameter get /name
