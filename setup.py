@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'tmplt_py'
+package_name = 'ros2_tmplt_py'
 
 setup(
     name=package_name,
